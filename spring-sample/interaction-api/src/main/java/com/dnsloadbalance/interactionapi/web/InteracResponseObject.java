@@ -1,12 +1,12 @@
-package com.be.web;
+package com.dnsloadbalance.interactionapi.web;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 
 @Data
 @Builder
-public class ResponseObject {
+public class InteracResponseObject {
+    private String interactionMessage;
     private String message;
     private String hostName;
     private String serverAddress;
