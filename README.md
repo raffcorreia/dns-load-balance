@@ -6,7 +6,7 @@
 `docker build -t bind9 .`
 
 # Run the container in background, using the same Docker network created:
-`docker run -d --rm --name=dns-server --net=dns-load-balance-net --ip=172.2.0.2 bind9`
+`docker run -d --name=dns-server --net=dns-load-balance-net --ip=172.2.0.2 bind9`
 
 # enable the bind9 daemon:
 `docker exec -d dns-server /etc/init.d/bind9 start`
