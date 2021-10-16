@@ -39,11 +39,11 @@
 
 				<configuration>
 					<skip>false</skip>
-					<mainClass>com.be.BackendApplication</mainClass>
+					<mainClass>com.dnsloadbalance.interactionapi.InteractionApiApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
+							w<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
 				</configuration>

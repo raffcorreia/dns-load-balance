@@ -8,8 +8,9 @@ $TTL    604800
 ;
 ; name servers - NS records
      IN      NS      ns1.test-be.com.
+ns1.test-be.com.    IN      A      172.0.0.2
 
 ; name servers - A records
-test-be.com.        IN      A      172.2.0.3
-test-be.com.        IN      A      172.2.0.4
-test-be.com.        IN      A      172.2.0.5
+test-be.com.        IN      A      172.0.0.3
+test-be.com.        IN      A      172.0.0.4
+test-be.com.        IN      A      172.0.0.5
