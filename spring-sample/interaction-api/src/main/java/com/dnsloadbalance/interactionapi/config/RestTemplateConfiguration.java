@@ -21,7 +21,7 @@ public class RestTemplateConfiguration {
     private int connectionRequestTimeout;
 
 
-    @Bean
+    @Bean(name = "restTemplateComponents")
     public RestTemplate restTemplate() {
         HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         clientHttpRequestFactory.setConnectTimeout(connectTimeout);

@@ -23,7 +23,8 @@ import static java.util.Objects.nonNull;
 public class InteractionController {
 
     @Autowired
-    RestTemplate restTemplate;
+    @Qualifier("restTemplateComponents")
+    RestTemplate restTemplateComponents;
 
     @Qualifier("restTemplateSimpleConnection")
     @Autowired
@@ -36,39 +37,32 @@ public class InteractionController {
     @ResponseBody
     public InteracResponseObject getFromHttpComponentsClientFactory() {
         log.debug("Entering fromHttpComponentsClientFactory");
-        InteracResponseObject response = new InteracResponseObject();
-
-        String hostInfo = getHostInfo(beEndpointURL);
-
-        ResponseEntity<BEResponseObject> responseEntity;
-        responseEntity = restTemplate.getForEntity(beEndpointURL, BEResponseObject.class);
-
-        if(nonNull(responseEntity.getBody())) {
-            BeanUtils.copyProperties(responseEntity.getBody(), response);
-        }
-
-        response.setInteractionMessage("This is from the interaction API!");
-        response.setHostInfo(hostInfo);
-
-        return response;
+        return getFromBE(restTemplateComponents);
     }
 
     @GetMapping(value = "/fromSimpleClientFactory", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public InteracResponseObject getFromSimpleClientFactory() {
         log.debug("Entering fromSimpleClientFactory");
+        return getFromBE(restTemplateSimpleConnection);
+    }
+
+    private InteracResponseObject getFromBE(RestTemplate restTemplate) {
         InteracResponseObject response = new InteracResponseObject();
 
         String hostInfo = getHostInfo(beEndpointURL);
 
         ResponseEntity<BEResponseObject> responseEntity;
-        responseEntity = restTemplateSimpleConnection.getForEntity(beEndpointURL, BEResponseObject.class);
-
-        if(nonNull(responseEntity.getBody())) {
-            BeanUtils.copyProperties(responseEntity.getBody(), response);
+        try {
+            responseEntity = restTemplate.getForEntity(beEndpointURL, BEResponseObject.class);
+            if (nonNull(responseEntity.getBody())) {
+                BeanUtils.copyProperties(responseEntity.getBody(), response);
+            }
+            response.setInteractionMessage("This is from the interaction API!");
+        } catch (Exception ex) {
+            response.setInteractionMessage("Error: " + ex.getMessage());
         }
 
-        response.setInteractionMessage("This is from the interaction API!");
         response.setHostInfo(hostInfo);
 
         return response;
