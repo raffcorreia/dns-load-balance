@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -33,28 +34,28 @@ public class InteractionController {
     @Value("${beEndpointURL}")
     String beEndpointURL;
 
-    @GetMapping(value = "/fromHttpComponentsClientFactory", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public InteracResponseObject getFromHttpComponentsClientFactory() {
+    @PostMapping(value = "/fromHttpComponentsClientFactory", produces = MediaType.APPLICATION_JSON_VALUE)
+    public InteracResponseObject getFromHttpComponentsClientFactory(@RequestBody Object request) {
         log.debug("Entering fromHttpComponentsClientFactory");
-        return getFromBE(restTemplateComponents);
+        return getFromBE(restTemplateComponents, request);
     }
 
-    @GetMapping(value = "/fromSimpleClientFactory", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public InteracResponseObject getFromSimpleClientFactory() {
+    @PostMapping(value = "/fromSimpleClientFactory", produces = MediaType.APPLICATION_JSON_VALUE)
+    public InteracResponseObject getFromSimpleClientFactory(@RequestBody Object request) {
         log.debug("Entering fromSimpleClientFactory");
-        return getFromBE(restTemplateSimpleConnection);
+        return getFromBE(restTemplateSimpleConnection, request);
     }
 
-    private InteracResponseObject getFromBE(RestTemplate restTemplate) {
+    private InteracResponseObject getFromBE(RestTemplate restTemplate, Object request) {
         InteracResponseObject response = new InteracResponseObject();
 
         String hostInfo = getHostInfo(beEndpointURL);
 
         ResponseEntity<BEResponseObject> responseEntity;
         try {
-            responseEntity = restTemplate.getForEntity(beEndpointURL, BEResponseObject.class);
+            responseEntity = restTemplate.postForEntity(beEndpointURL, request, BEResponseObject.class);
             if (nonNull(responseEntity.getBody())) {
                 BeanUtils.copyProperties(responseEntity.getBody(), response);
             }
