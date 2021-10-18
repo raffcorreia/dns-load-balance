@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Instant;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -36,6 +38,8 @@ public class InteractionController {
         log.debug("Entering fromHttpComponentsClientFactory");
         InteracResponseObject response = new InteracResponseObject();
 
+        String hostInfo = getHostInfo(beEndpointURL);
+
         ResponseEntity<BEResponseObject> responseEntity;
         responseEntity = restTemplate.getForEntity(beEndpointURL, BEResponseObject.class);
 
@@ -44,6 +48,7 @@ public class InteractionController {
         }
 
         response.setInteractionMessage("This is from the interaction API!");
+        response.setHostInfo(hostInfo);
 
         return response;
     }
@@ -54,6 +59,8 @@ public class InteractionController {
         log.debug("Entering fromSimpleClientFactory");
         InteracResponseObject response = new InteracResponseObject();
 
+        String hostInfo = getHostInfo(beEndpointURL);
+
         ResponseEntity<BEResponseObject> responseEntity;
         responseEntity = restTemplateSimpleConnection.getForEntity(beEndpointURL, BEResponseObject.class);
 
@@ -62,7 +69,23 @@ public class InteractionController {
         }
 
         response.setInteractionMessage("This is from the interaction API!");
+        response.setHostInfo(hostInfo);
 
         return response;
+    }
+
+    private String getHostInfo(String url) {
+        if(isNull(url)) {
+            return null;
+        }
+
+        String hostInfo = null;
+        try {
+            InetAddress address = InetAddress.getByName(url.replace("http://", "").split(":")[0]);
+            hostInfo = address.getHostName() + " = {" + address.getHostAddress() + "}";
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return hostInfo;
     }
 }

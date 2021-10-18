@@ -12,4 +12,5 @@ public class InteracResponseObject {
     private String serverAddress;
     private String serverPort;
     private Instant serverDataTime;
+    private String hostInfo;
 }
