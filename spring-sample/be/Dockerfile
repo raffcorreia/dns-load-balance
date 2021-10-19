@@ -12,3 +12,4 @@ EXPOSE 9090/tcp
 EXPOSE 9090/udp
 
 ENTRYPOINT ["java","-jar","/app.jar"]
+# CMD ["/bin/sh", "-c", "while :; do sleep 10; done"]
