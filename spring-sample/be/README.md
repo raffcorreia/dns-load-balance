@@ -8,3 +8,6 @@
 
 # Start container after stopped
 `docker start be-dns-3`
+
+# run application if not started with the container
+`docker exec -d be-dns-3 java -jar /app.jar`

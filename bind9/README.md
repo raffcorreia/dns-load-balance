@@ -25,7 +25,9 @@
 `apt-get install vim`
 
 `apt-get update; apt-get install iputils-ping -y;apt install dnsutils -y;apt-get install vim -y`
+```sh
 apt-get install -y \
   iputils-ping \
   dnsutils \
   vim
+```
