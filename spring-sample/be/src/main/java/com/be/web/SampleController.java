@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
 
+import static java.util.Objects.nonNull;
+
 @RestController
 public class SampleController {
 
@@ -23,7 +25,9 @@ public class SampleController {
     @PostMapping(value = "/sample", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseObject getFromDownStream(@RequestBody RequestObject request) throws InterruptedException {
 
-        Thread.sleep(request.getWaitForMilliseconds());
+        if(nonNull(request) && nonNull(request.getWaitForMilliseconds())) {
+            Thread.sleep(request.getWaitForMilliseconds());
+        }
 
         String serverAddress = null;
         String hostName = null;
@@ -40,7 +44,7 @@ public class SampleController {
                 .hostName(hostName)
                 .serverAddress(serverAddress)
                 .serverPort(environment.getProperty("local.server.port"))
-                .serverDataTime(Instant.now())
+                .serverDataTime(Instant.now().toString())
                 .build();
     }
 }
