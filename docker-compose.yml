@@ -1,0 +1,69 @@
+version: '3.9'
+networks:
+  dns-load-balance-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.0.0.0/24"
+
+services:
+  bind9:
+    build:
+      context: ./bind9
+    image: bind9
+    container_name: dns-server
+    ports:
+      - '53:53'
+    networks:
+      dns-load-balance-net:
+        ipv4_address: 172.0.0.2
+    dns:
+      - 172.0.0.2
+
+  interaction-api:
+    build:
+      context: ./spring-sample/interaction-api
+    image: interaction-api
+    container_name: interaction-api
+    ports:
+      - '8080:8080'
+    networks:
+      dns-load-balance-net:
+        ipv4_address: 172.0.0.254
+    dns:
+      - 172.0.0.2
+
+  be-dns:
+    build:
+      context: ./spring-sample/be
+    image: be-dns
+    container_name: be-dns-3
+    ports:
+      - '9090:9090'
+    networks:
+      dns-load-balance-net:
+        ipv4_address: 172.0.0.3
+    dns:
+      - 172.0.0.2
+
+  be-dns-4:
+    image: be-dns
+    container_name: be-dns-4
+    ports:
+      - '9094:9090'
+    networks:
+      dns-load-balance-net:
+        ipv4_address: 172.0.0.4
+    dns:
+      - 172.0.0.2
+
+  be-dns-5:
+    image: be-dns
+    container_name: be-dns-5
+    ports:
+      - '9095:9090'
+    networks:
+      dns-load-balance-net:
+        ipv4_address: 172.0.0.5
+    dns:
+      - 172.0.0.2
