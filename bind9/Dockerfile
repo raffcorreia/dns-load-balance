@@ -22,8 +22,11 @@ COPY named.conf.options /etc/bind/
 COPY named.conf.local /etc/bind/
 COPY db.test-be.com /etc/bind/zones/
 
-ADD resolv.conf /tmp/resolv.conf
+ADD resolv.conf /tmp/resolv.conf    
 
 # Run eternal loop
-CMD ["/bin/bash", "-c", "while :; do sleep 10; done"]
 # CMD ["/bin/bash", "-c", "cp -f /tmp/resolv.conf /etc/resolv.conf; while :; do sleep 10; done"]
+# CMD ["/bin/bash", "-c", "/etc/init.d/bind9 start"]
+# CMD ["/bin/bash", "-c", "while :; do sleep 1000; done"]
+# ENTRYPOINT ["/bin/bash", "-c", "/etc/init.d/bind9 start"]
+CMD ["/bin/bash", "-c", "/etc/init.d/bind9 start; while :; do sleep 1000; done"]
