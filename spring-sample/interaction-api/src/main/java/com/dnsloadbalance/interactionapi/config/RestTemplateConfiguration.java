@@ -1,7 +1,16 @@
 package com.dnsloadbalance.interactionapi.config;
 
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
+import org.apache.http.HttpResponse;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeaderElementIterator;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -27,9 +36,7 @@ public class RestTemplateConfiguration {
         clientHttpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
         clientHttpRequestFactory.setReadTimeout(readTimeout);
 
-        return new RestTemplateBuilder()
-                .requestFactory(() -> clientHttpRequestFactory)
-                .build();
+        return new RestTemplate(clientHttpRequestFactory);
     }
 
     @Bean(name = "restTemplateSimpleConnection")
@@ -38,8 +45,40 @@ public class RestTemplateConfiguration {
         clientHttpRequestFactory.setConnectTimeout(connectTimeout);
         clientHttpRequestFactory.setReadTimeout(readTimeout);
 
-        return new RestTemplateBuilder()
-                .requestFactory(() -> clientHttpRequestFactory)
-                .build();
+        return new RestTemplate(clientHttpRequestFactory);
     }
+
+    @Bean(name = "restTemplateManaged")
+    public RestTemplate restTemplateManaged() {
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+
+        CloseableHttpClient client = HttpClients.custom()
+                .setKeepAliveStrategy(connectionKeepAliveStrategy)
+                .setConnectionManager(connManager)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectTimeout(connectTimeout);
+        httpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
+        httpRequestFactory.setReadTimeout(readTimeout);
+        httpRequestFactory.setHttpClient(client);
+
+        return new RestTemplate(httpRequestFactory);
+    }
+
+    ConnectionKeepAliveStrategy connectionKeepAliveStrategy = new ConnectionKeepAliveStrategy() {
+        @Override
+        public long getKeepAliveDuration(HttpResponse httpResponse, HttpContext httpContext) {
+            HeaderElementIterator elementIterator = new BasicHeaderElementIterator(httpResponse.headerIterator(HTTP.CONN_KEEP_ALIVE));
+            while(elementIterator.hasNext()){
+                HeaderElement element = elementIterator.nextElement();
+                String value = element.getValue();
+                if(value != null &&  "timeout".equalsIgnoreCase(element.getName())) {
+                    return Long.parseLong(value) * 1000;
+                }
+            }
+            return 5000;
+        }
+    };
+
 }

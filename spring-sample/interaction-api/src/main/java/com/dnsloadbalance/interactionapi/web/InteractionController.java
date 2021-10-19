@@ -27,9 +27,13 @@ public class InteractionController {
     @Qualifier("restTemplateComponents")
     RestTemplate restTemplateComponents;
 
-    @Qualifier("restTemplateSimpleConnection")
     @Autowired
+    @Qualifier("restTemplateSimpleConnection")
     RestTemplate restTemplateSimpleConnection;
+
+    @Autowired
+    @Qualifier("restTemplateManaged")
+    private RestTemplate restTemplateManaged;
 
     @Value("${beEndpointURL}")
     String beEndpointURL;
@@ -46,6 +50,13 @@ public class InteractionController {
     public InteracResponseObject getFromSimpleClientFactory(@RequestBody Object request) {
         log.debug("Entering fromSimpleClientFactory");
         return getFromBE(restTemplateSimpleConnection, request);
+    }
+
+    @ResponseBody
+    @PostMapping(value = "/fromManaged", produces = MediaType.APPLICATION_JSON_VALUE)
+    public InteracResponseObject getFromManaged(@RequestBody Object request) {
+        log.debug("Entering fromManaged");
+        return getFromBE(restTemplateManaged, request);
     }
 
     private InteracResponseObject getFromBE(RestTemplate restTemplate, Object request) {
